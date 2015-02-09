@@ -1,0 +1,39 @@
+---
+
+#4. Use Ansible to restore your 'primary Ethernet interface' back to the following state:
+#description:           <none>
+#switchport mode:       access
+#access VLAN:            1
+#trunk allowed VLANs:    all
+
+#Also use Ansible to remove the three VLANs that you configured.
+
+- name: Exrecise 4
+  hosts: arista
+
+  tasks:
+    - name: Delete description
+      eos_interface: name=Ethernet3 admin=enable null_as_default=true
+            eapi_username={{eapi_username}}
+            eapi_password={{eapi_password}}
+            eapi_hostname={{eapi_hostname}}
+            eapi_port={{eapi_port}}
+
+    - name: Place in mode access and vlan 1
+      eos_switchport: name=Ethernet3 mode=access access_vlan=1 trunk_allowed_vlans=all
+            eapi_username={{eapi_username}}
+            eapi_password={{eapi_password}}
+            eapi_hostname={{eapi_hostname}}
+            eapi_port={{eapi_port}}
+
+    - name: Delete VLANs
+      eos_vlan: name={{item.vlan_name}} vlanid={{item.vlan_id}} state=unconfigured
+            eapi_username={{eapi_username}}
+            eapi_password={{eapi_password}}
+            eapi_hostname={{eapi_hostname}}
+            eapi_port={{eapi_port}}
+      with_items:
+        - {vlan_name: network110, vlan_id: 110}
+        - {vlan_name: network120, vlan_id: 120}
+        - {vlan_name: network130, vlan_id: 130}
+        
